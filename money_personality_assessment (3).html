@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Money Personality Assessment | FinPath by HUB</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #cdeafe;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    .wrapper {
+      max-width: 720px;
+      width: 100%;
+    }
+
+    /* HEADER */
+    .header {
+      background: #263746;
+      border-radius: 16px 16px 0 0;
+      padding: 32px 36px 24px;
+      text-align: center;
+    }
+    .header .hub-badge {
+      display: inline-block;
+      background: #0678d5;
+      color: #fff;
+      font-size: 11px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .header h1 {
+      color: #fff;
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .header h1 span { color: #f3b921; }
+    .header p {
+      color: #cdeafe;
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .progress-bar-wrap {
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      padding: 14px 36px 0;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: #263746;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .progress-track {
+      background: #e3e3e3;
+      border-radius: 99px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, #0678d5, #00aeef);
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* CARD */
+    .card {
+      background: #fff;
+      border-radius: 0 0 16px 16px;
+      padding: 28px 36px 36px;
+      box-shadow: 0 8px 32px rgba(38,55,70,0.12);
+    }
+
+    /* QUESTION */
+    .question-block { display: none; }
+    .question-block.active { display: block; }
+    .q-number {
+      font-size: 11px;
+      font-weight: bold;
+      color: #0678d5;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .q-text {
+      font-size: 18px;
+      font-weight: bold;
+      color: #263746;
+      line-height: 1.45;
+      margin-bottom: 22px;
+    }
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 14px 18px;
+      background: #fff;
+      border: 2px solid #e3e3e3;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #263746;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+    .option-btn:hover {
+      border-color: #0678d5;
+      background: #f0f8ff;
+      color: #263746;
+    }
+    .option-btn.selected {
+      border-color: #0678d5;
+      background: #cdeafe;
+      font-weight: bold;
+      color: #263746;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+    }
+    .btn-back {
+      background: none;
+      border: none;
+      color: #0678d5;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 8px 0;
+      font-weight: bold;
+    }
+    .btn-back:hover { text-decoration: underline; }
+    .btn-next {
+      background: #0678d5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-next:disabled { background: #e3e3e3; color: #aaa; cursor: not-allowed; }
+    .btn-next:hover:not(:disabled) { background: #0560b0; }
+
+    /* RESULTS */
+    #results { display: none; }
+    .result-hero {
+      text-align: center;
+      padding: 20px 0 24px;
+      border-bottom: 2px solid #e3e3e3;
+      margin-bottom: 24px;
+    }
+    .result-emoji { font-size: 52px; margin-bottom: 8px; }
+    .result-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #0678d5;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .result-title {
+      font-size: 30px;
+      font-weight: 900;
+      color: #263746;
+      margin-bottom: 10px;
+    }
+    .result-desc {
+      font-size: 14px;
+      color: #385263;
+      line-height: 1.7;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .sections-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 520px) { .sections-row { grid-template-columns: 1fr; } }
+    .section-box {
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .section-box.watch { background: #fff0f3; border: 1.5px solid #f8c0cc; }
+    .section-box.action { background: #eafbea; border: 1.5px solid #b2e8b2; }
+    .section-box h4 {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .section-box.watch h4 { color: #ac1534; }
+    .section-box.action h4 { color: #3ebd3e; }
+    .section-box ul { padding-left: 16px; }
+    .section-box ul li {
+      font-size: 13px;
+      color: #263746;
+      margin-bottom: 5px;
+      line-height: 1.4;
+    }
+
+    .secondary-box {
+      background: #f0f8ff;
+      border: 1.5px solid #cdeafe;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+    .secondary-box h4 {
+      font-size: 12px;
+      font-weight: bold;
+      color: #0678d5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .secondary-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .secondary-tag {
+      background: #0678d5;
+      color: #fff;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .cta-box {
+      background: #263746;
+      border-radius: 12px;
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .cta-box p {
+      color: #cdeafe;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .cta-box strong { color: #f3b921; }
+    .btn-cta {
+      background: #0678d5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-retake {
+      background: none;
+      border: 2px solid #cdeafe;
+      color: #cdeafe;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #385263;
+      margin-top: 18px;
+      line-height: 1.5;
+    }
+
+    /* INTRO */
+    #intro { display: block; }
+    .intro-icons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .intro-icon {
+      text-align: center;
+      background: #f0f8ff;
+      border: 1.5px solid #cdeafe;
+      border-radius: 10px;
+      padding: 14px 16px;
+      width: 90px;
+    }
+    .intro-icon .ico { font-size: 26px; margin-bottom: 4px; }
+    .intro-icon .lbl { font-size: 11px; color: #263746; font-weight: bold; }
+    .intro-btn {
+      display: block;
+      width: 100%;
+      background: #0678d5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+    }
+    .intro-btn:hover { background: #0560b0; }
+    .intro-title { font-size: 20px; font-weight: 900; color: #263746; margin-bottom: 10px; }
+    .intro-sub { font-size: 14px; color: #385263; line-height: 1.6; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="hub-badge">FinPath by HUB</div>
+    <h1>What's Your <span>Money</span> Personality?</h1>
+    <p>Understand your habits, patterns, and relationship with money. Make smarter choices starting today.</p>
+  </div>
+
+  <div class="progress-bar-wrap" id="progressWrap" style="display:none;">
+    <div class="progress-label" id="progressLabel">Question 1 of 14</div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="card">
+
+    <!-- INTRO -->
+    <div id="intro">
+      <div class="intro-title">Unmask Your Money Habits 🎭</div>
+      <div class="intro-sub">Answer 14 quick questions honestly. There are no right or wrong answers. This is just about <strong>you and your money story</strong>.</div>
+      <div class="intro-icons">
+        <div class="intro-icon"><div class="ico">🎯</div><div class="lbl">5 Types</div></div>
+        <div class="intro-icon"><div class="ico">⏱️</div><div class="lbl">~3 Min</div></div>
+        <div class="intro-icon"><div class="ico">💡</div><div class="lbl">Actionable Tips</div></div>
+        <div class="intro-icon"><div class="ico">🔒</div><div class="lbl">Private</div></div>
+      </div>
+      <button class="intro-btn" onclick="startQuiz()">Start Assessment →</button>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quiz" style="display:none;">
+      <div id="questionsContainer"></div>
+      <div class="nav-row">
+        <button class="btn-back" id="btnBack" onclick="prevQuestion()">← Back</button>
+        <button class="btn-next" id="btnNext" onclick="nextQuestion()" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results">
+      <div class="result-hero">
+        <div class="result-emoji" id="resEmoji"></div>
+        <div class="result-label">Your Primary Money Personality</div>
+        <div class="result-title" id="resTitle"></div>
+        <div class="result-desc" id="resDesc"></div>
+      </div>
+
+      <div class="sections-row">
+        <div class="section-box watch">
+          <h4>⚠️ Watch Out For</h4>
+          <ul id="resWatch"></ul>
+        </div>
+        <div class="section-box action">
+          <h4>✅ What to Do</h4>
+          <ul id="resAction"></ul>
+        </div>
+      </div>
+
+      <div class="secondary-box" id="secondaryBox" style="display:none;">
+        <h4>🔍 You Also Relate To</h4>
+        <div class="secondary-tags" id="secondaryTags"></div>
+      </div>
+
+      <div class="cta-box">
+        <p>Ready to take the next step? <strong>FinPath coaching</strong> helps you build on your strengths and work through your money challenges. One step at a time.</p>
+        <a href="https://www.finpathwellness.com/coaching" target="_blank" rel="noopener noreferrer"><button class="btn-cta">Connect with a FinPath Coach</button></a><br/>
+        <button class="btn-retake" onclick="retake()">Retake Assessment</button>
+      </div>
+
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── PERSONALITY TYPES ──────────────────────────────────────────────────────
+const types = {
+  SPENDER: {
+    key: 'SPENDER',
+    label: 'The Spender / Impulsive',
+    emoji: '🛍️',
+    desc: 'You find joy in buying things and you live in the moment. Money feels like it is meant to be spent and enjoyed right now. Plans can feel restrictive and spontaneous purchases feel exciting. Your energy and generosity are real strengths, but overspending and debt can sneak up on you over time.',
+    watch: ['Impulse buying and emotional shopping', 'Spending more than you earn', 'Carrying credit card balances month to month', 'No progress on savings or long-term goals'],
+    action: ['Create a spending plan that includes a "fun money" category', 'Wait 24 to 48 hours before any non-essential purchase', 'Set up automatic savings so money is set aside before you spend', 'Try the envelope budgeting method to pre-assign your spending']
+  },
+  PENNY_PINCHER: {
+    key: 'PENNY_PINCHER',
+    label: 'The Penny Pincher',
+    emoji: '🏦',
+    desc: 'You are disciplined, security-focused, and saving comes naturally to you. You watch every dollar carefully. The challenge is that fear of spending can cause stress even when your finances are stable, and you may hold back on things you truly need or deserve.',
+    watch: ['Refusing to spend even on legitimate needs', 'Money anxiety that persists even when finances are healthy', 'Missing out on experiences or smart investments out of excessive caution'],
+    action: ['Build a solid emergency fund so your security baseline feels stable', 'Allow yourself a set monthly amount for guilt-free spending', 'Explore investment options so your money keeps growing while you feel at ease']
+  },
+  AVOIDER: {
+    key: 'AVOIDER',
+    label: 'The Avoider',
+    emoji: '🙈',
+    desc: 'Financial stress, shame, or overwhelm leads you to look away from your money. Bills pile up unopened and checking your accounts feels too heavy to face. The good news is that small, consistent steps can completely change your relationship with money.',
+    watch: ['Late fees and missed payments caused by avoidance', 'Financial anxiety that grows because nothing gets addressed', 'Shame or fear that keeps you stuck and unable to move forward'],
+    action: ['Start small by checking one account for just 5 minutes today', 'Create a very basic spending plan covering income and fixed bills', 'Use a budgeting app to build awareness without the overwhelm']
+  },
+  PLANNER: {
+    key: 'PLANNER',
+    label: 'The Planner',
+    emoji: '📊',
+    desc: 'You are organized, goal-oriented, and forward-thinking with money. Budgets and spreadsheets feel natural to you. Your challenge is being careful not to become so rigid that you miss out on enjoying today or taking smart calculated risks.',
+    watch: ['Being overly rigid with no room for life\'s surprises', 'Analysis paralysis that delays financial decisions', 'Sacrificing present-day joy by always planning for later'],
+    action: ['Schedule an annual financial check-up to review and celebrate your progress', 'Build a spontaneous or fun category into your budget so enjoyment is planned for', 'Keep learning by exploring investment and wealth-building strategies available to you']
+  },
+  GIVER: {
+    key: 'GIVER',
+    label: 'The Giver',
+    emoji: '💝',
+    desc: 'Your heart often leads your money decisions. You genuinely love helping others and your natural instinct is generosity. You may pay for things, help family members, lend money without expecting it back, or put other people\'s needs ahead of your own. At your best you are caring, supportive, and community-minded. The challenge comes when generosity happens without healthy boundaries.',
+    watch: ['Draining your savings to help others', 'Going into debt to meet someone else\'s needs', 'Delaying your own goals like building an emergency fund or saving for retirement', 'Feeling guilty saying no when someone asks for financial help'],
+    action: ['Use the oxygen mask rule: build your own financial foundation first so you can give more sustainably', 'Set a monthly giving budget so your generosity stays within a healthy limit', 'Remember that taking care of your financial health allows you to help even more in the long run']
+  }
+};
+
+// ── QUESTIONS ──────────────────────────────────────────────────────────────
+const questions = [
+  {
+    text: "When I get an unexpected $200, my first instinct is:",
+    answers: [
+      { label: "Treat myself. I've been wanting something!", type: 'SPENDER' },
+      { label: "Put it straight into savings, no questions asked.", type: 'PENNY_PINCHER' },
+      { label: "I'll figure it out later... probably.", type: 'AVOIDER' },
+      { label: "Allocate it to a specific goal right away.", type: 'PLANNER' },
+      { label: "Help someone who needs it more than I do.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "How do you feel when you open your bank app?",
+    answers: [
+      { label: "A little nervous, but I still spend anyway.", type: 'SPENDER' },
+      { label: "Relieved if it's growing, anxious if anything dipped.", type: 'PENNY_PINCHER' },
+      { label: "I avoid opening it as long as possible.", type: 'AVOIDER' },
+      { label: "Calm. I know exactly what's there.", type: 'PLANNER' },
+      { label: "Fine, but I'm usually thinking about what I can give.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "A friend asks to borrow $100 and probably can't pay it back. You:",
+    answers: [
+      { label: "Just do it in the moment and figure it out later.", type: 'SPENDER' },
+      { label: "Hesitate a lot. That's a big chunk of savings.", type: 'PENNY_PINCHER' },
+      { label: "Feel bad and avoid giving a clear answer.", type: 'AVOIDER' },
+      { label: "Offer what fits your giving budget and nothing more.", type: 'PLANNER' },
+      { label: "Give it without hesitation. They need it more than me.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "When I'm stressed, I tend to:",
+    answers: [
+      { label: "Buy something. Retail therapy lifts my mood.", type: 'SPENDER' },
+      { label: "Check my savings balance to feel secure.", type: 'PENNY_PINCHER' },
+      { label: "Ignore everything financial and deal with it later.", type: 'AVOIDER' },
+      { label: "Re-review my budget and adjust my plan.", type: 'PLANNER' },
+      { label: "Help someone else. Focusing outward calms me.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "My financial goals are best described as:",
+    answers: [
+      { label: "I have goals but spending usually wins in the moment.", type: 'SPENDER' },
+      { label: "Very clear. I'm always saving for something specific.", type: 'PENNY_PINCHER' },
+      { label: "I haven't really set any. It feels overwhelming.", type: 'AVOIDER' },
+      { label: "Written down with timelines and milestones.", type: 'PLANNER' },
+      { label: "Mostly focused on being able to help and provide for others.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "How do you feel about making a budget?",
+    answers: [
+      { label: "I make them but overspend anyway.", type: 'SPENDER' },
+      { label: "I love a budget. It's my safety net.", type: 'PENNY_PINCHER' },
+      { label: "I keep putting it off. It feels too complicated.", type: 'AVOIDER' },
+      { label: "Already done and I review it regularly.", type: 'PLANNER' },
+      { label: "I budget, but I often give away what I saved.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "What best describes how money was handled growing up in your home?",
+    answers: [
+      { label: "Money was spent freely. Enjoy life now.", type: 'SPENDER' },
+      { label: "Every penny was counted and saving was the top priority.", type: 'PENNY_PINCHER' },
+      { label: "Money was a stressful topic nobody really talked about.", type: 'AVOIDER' },
+      { label: "Budgets, goals, and financial discipline were the norm.", type: 'PLANNER' },
+      { label: "Sharing and helping others financially was the highest value.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "My biggest money challenge right now is:",
+    answers: [
+      { label: "Spending too much on things I don't really need.", type: 'SPENDER' },
+      { label: "Spending anything at all. It causes me anxiety.", type: 'PENNY_PINCHER' },
+      { label: "Not knowing where my money actually goes.", type: 'AVOIDER' },
+      { label: "Being too rigid and not allowing for flexibility.", type: 'PLANNER' },
+      { label: "Giving too much to others and not saving for myself.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "If I found out I had more debt than I realized, I would:",
+    answers: [
+      { label: "Feel bad but probably still spend on comfort items.", type: 'SPENDER' },
+      { label: "Panic and immediately cut everything to pay it off.", type: 'PENNY_PINCHER' },
+      { label: "Feel overwhelmed and try not to think about it.", type: 'AVOIDER' },
+      { label: "Build a clear payoff plan with specific targets and timelines.", type: 'PLANNER' },
+      { label: "Worry about how it affects my ability to help others.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "When it comes to retirement savings, I:",
+    answers: [
+      { label: "Know I should save more. I just enjoy the present more.", type: 'SPENDER' },
+      { label: "Have been saving for years and check it regularly.", type: 'PENNY_PINCHER' },
+      { label: "Haven't really looked into it. It feels far away.", type: 'AVOIDER' },
+      { label: "Have a full plan with contribution rate, target, and timeline.", type: 'PLANNER' },
+      { label: "Worry I'm delaying my retirement savings by helping others.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "How do you feel about asking for financial coaching or help?",
+    answers: [
+      { label: "Open to it, especially if it helps me stop overspending.", type: 'SPENDER' },
+      { label: "A little defensive. I've always been careful with money.", type: 'PENNY_PINCHER' },
+      { label: "Embarrassed or afraid of being judged.", type: 'AVOIDER' },
+      { label: "Great. I love learning and optimizing my finances.", type: 'PLANNER' },
+      { label: "I'd focus more on how to better help my family, not myself.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "Pick the statement that sounds most like you:",
+    answers: [
+      { label: "\"I work hard and I deserve to enjoy my money.\"", type: 'SPENDER' },
+      { label: "\"You never know what could happen. Save everything you can.\"", type: 'PENNY_PINCHER' },
+      { label: "\"I'll deal with my finances when things calm down.\"", type: 'AVOIDER' },
+      { label: "\"A plan today keeps financial stress away.\"", type: 'PLANNER' },
+      { label: "\"My family's needs come before my own financial comfort.\"", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "How often do you track your spending?",
+    answers: [
+      { label: "Rarely. I prefer not to look sometimes.", type: 'SPENDER' },
+      { label: "Every day. I know exactly what's in every account.", type: 'PENNY_PINCHER' },
+      { label: "Almost never. It makes me anxious.", type: 'AVOIDER' },
+      { label: "Weekly using a system I've had in place for a while.", type: 'PLANNER' },
+      { label: "I track what I give, but not always what I spend on myself.", type: 'GIVER' }
+    ]
+  },
+  {
+    text: "What do you most want from your relationship with money?",
+    answers: [
+      { label: "Freedom to enjoy it without guilt.", type: 'SPENDER' },
+      { label: "Security and a growing safety net.", type: 'PENNY_PINCHER' },
+      { label: "To feel less stressed and overwhelmed by it.", type: 'AVOIDER' },
+      { label: "Confidence that my financial future is fully covered.", type: 'PLANNER' },
+      { label: "To give generously without putting my own stability at risk.", type: 'GIVER' }
+    ]
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function startQuiz() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('progressWrap').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+
+  const q = questions[current];
+  const shuffled = shuffle([...q.answers]);
+
+  const block = document.createElement('div');
+  block.className = 'question-block active';
+  block.innerHTML = `
+    <div class="q-number">Question ${current + 1} of ${questions.length}</div>
+    <div class="q-text">${q.text}</div>
+    <div class="options" id="opts"></div>
+  `;
+  container.appendChild(block);
+
+  const opts = document.getElementById('opts');
+  shuffled.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[current] && answers[current].label === ans.label ? ' selected' : '');
+    btn.textContent = ans.label;
+    btn.onclick = () => selectAnswer(ans, btn);
+    opts.appendChild(btn);
+  });
+
+  // Helper hint
+  const hint = document.createElement('p');
+  hint.id = 'selectHint';
+  hint.style.cssText = 'text-align:center;font-size:13px;color:#0678d5;margin-top:14px;font-weight:bold;';
+  hint.textContent = '👆 Select an answer above to continue';
+  if (answers[current]) hint.style.display = 'none';
+  container.appendChild(hint);
+
+  updateProgress();
+  updateNav();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function selectAnswer(ans, btn) {
+  answers[current] = ans;
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('btnNext').disabled = false;
+  const hint = document.getElementById('selectHint');
+  if (hint) hint.style.display = 'none';
+}
+
+function nextQuestion() {
+  if (answers[current] === null) return;
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function prevQuestion() {
+  if (current > 0) {
+    current--;
+    renderQuestion();
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round(((current) / questions.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Question ${current + 1} of ${questions.length}`;
+}
+
+function updateNav() {
+  document.getElementById('btnBack').style.visibility = current === 0 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').disabled = answers[current] === null;
+  document.getElementById('btnNext').textContent = current === questions.length - 1 ? 'See My Results 🎉' : 'Next →';
+}
+
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  // Tally scores
+  const scores = {};
+  Object.keys(types).forEach(k => scores[k] = 0);
+  answers.forEach(a => { if (a) scores[a.type]++; });
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const primary = sorted[0][0];
+  const t = types[primary];
+
+  document.getElementById('resEmoji').textContent = t.emoji;
+  document.getElementById('resTitle').textContent = t.label;
+  document.getElementById('resDesc').textContent = t.desc;
+
+  const watchEl = document.getElementById('resWatch');
+  watchEl.innerHTML = '';
+  t.watch.forEach(w => { const li = document.createElement('li'); li.textContent = w; watchEl.appendChild(li); });
+
+  const actionEl = document.getElementById('resAction');
+  actionEl.innerHTML = '';
+  t.action.forEach(a => { const li = document.createElement('li'); li.textContent = a; actionEl.appendChild(li); });
+
+  // Secondary types (score >= 2 and not primary)
+  const secondaries = sorted.slice(1).filter(([k, v]) => v >= 2).map(([k]) => types[k].label);
+  if (secondaries.length > 0) {
+    document.getElementById('secondaryBox').style.display = 'block';
+    const tagsEl = document.getElementById('secondaryTags');
+    tagsEl.innerHTML = '';
+    secondaries.forEach(s => {
+      const span = document.createElement('span');
+      span.className = 'secondary-tag';
+      span.textContent = s;
+      tagsEl.appendChild(span);
+    });
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function retake() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('intro').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
